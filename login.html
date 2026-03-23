@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up / Login - YOUtility</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">YOUtility</div>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="providers.html">Providers</a></li>
+                <li><a href="login.html">Sign Up / Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="auth-section">
+            <div class="auth-container">
+                <div class="auth-tabs">
+                    <button class="tab-button active" onclick="showTab('login')">Login</button>
+                    <button class="tab-button" onclick="showTab('signup')">Sign Up</button>
+                </div>
+
+                <div id="login-form" class="auth-form">
+                    <h2>Login to Your Account</h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="login-email">Email</label>
+                            <input type="email" id="login-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" required>
+                        </div>
+                        <button type="submit" class="auth-button">Login</button>
+                    </form>
+                    <p class="auth-link">Forgot your password? <a href="#">Reset here</a></p>
+                </div>
+
+                <div id="signup-form" class="auth-form" style="display: none;">
+                    <h2>Create Your Account</h2>
+                    <form id="signupForm">
+                        <div class="form-group">
+                            <label for="signup-name">Full Name</label>
+                            <input type="text" id="signup-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-email">Email</label>
+                            <input type="email" id="signup-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-phone">Phone Number</label>
+                            <input type="tel" id="signup-phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-password">Password</label>
+                            <input type="password" id="signup-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-confirm-password">Confirm Password</label>
+                            <input type="password" id="signup-confirm-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="signup-provider" onchange="toggleProviderFields()">
+                                I am a service provider
+                            </label>
+                        </div>
+                        <div id="provider-fields" style="display: none;">
+                            <div class="form-group">
+                                <label for="signup-service-type">Service Type</label>
+                                <select id="signup-service-type">
+                                    <option value="">Select Service</option>
+                                    <option value="electrician">Electrician</option>
+                                    <option value="plumber">Plumber</option>
+                                    <option value="carpenter">Carpenter</option>
+                                    <option value="mechanic">Car Mechanic</option>
+                                    <option value="painter">Painter</option>
+                                    <option value="barber">Barber</option>
+                                    <option value="chef">Chef/Cook</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="signup-experience">Years of Experience</label>
+                                <input type="number" id="signup-experience" min="0">
+                            </div>
+                        </div>
+                        <button type="submit" class="auth-button">Sign Up</button>
+                    </form>
+                    <p class="auth-link">Already have an account? <a href="#" onclick="showTab('login')">Login here</a></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 YOUtility. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="auth.js"></script>
+</body>
+</html>

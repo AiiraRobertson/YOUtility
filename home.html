@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - YOUtility</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">YOUtility</div>
+            <ul>
+                <li><a href="home.html">Home</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="providers.html">Providers</a></li>
+                <li><a href="history.html">My Bookings</a></li>
+                <li><a href="login.html">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Find the Right Service for You</h1>
+            <p>Browse our comprehensive list of services and connect with trusted professionals.</p>
+        </section>
+
+        <section class="services-list">
+            <h2>Available Services</h2>
+            <div class="search-filter">
+                <input type="text" id="search-input" placeholder="Search services...">
+                <select id="category-filter">
+                    <option value="">All Categories</option>
+                    <option value="home">Home Services</option>
+                    <option value="auto">Auto Services</option>
+                    <option value="beauty">Beauty & Personal Care</option>
+                    <option value="food">Food & Culinary</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="services-grid" id="services-container">
+                <!-- Services will be populated by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 YOUtility. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="home.js"></script>
+</body>
+</html>
