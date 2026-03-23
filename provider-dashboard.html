@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provider Dashboard - YOUtility</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">YOUtility</div>
+            <ul>
+                <li><a href="home.html">Home</a></li>
+                <li><a href="providers.html">Find Work</a></li>
+                <li><a href="provider-dashboard.html">Dashboard</a></li>
+                <li><a href="profile.html">My Profile</a></li>
+                <li><a href="login.html">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="dashboard-section">
+            <div class="dashboard-header">
+                <h1>Provider Dashboard</h1>
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="pending-count">0</span>
+                            <span class="stat-label">Pending Jobs</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🔄</div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="active-count">0</span>
+                            <span class="stat-label">Active Jobs</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="completed-count">0</span>
+                            <span class="stat-label">Completed Jobs</span>
+                        </div>
+                    </div>
+                    <div class="stat-card earnings">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="earnings-total">$0</span>
+                            <span class="stat-label">Total Earnings</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-tabs">
+                <button class="tab-button active" onclick="showDashboardTab('incoming')">Incoming Bookings</button>
+                <button class="tab-button" onclick="showDashboardTab('active')">Active Jobs</button>
+                <button class="tab-button" onclick="showDashboardTab('completed')">Job History</button>
+                <button class="tab-button" onclick="showDashboardTab('earnings')">Earnings</button>
+            </div>
+
+            <div id="dashboard-content">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 YOUtility. All rights reserved.</p>
+    </footer>
+
+    <!-- Modal for Accept/Reject actions -->
+    <div id="booking-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modal-body">
+                <!-- Modal content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for job progress updates -->
+    <div id="progress-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="progress-modal-body">
+                <!-- Progress modal content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="provider-dashboard.js"></script>
+</body>
+</html>
