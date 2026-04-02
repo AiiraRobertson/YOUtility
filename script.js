@@ -47,15 +47,57 @@ document.querySelectorAll('.provider-image, .service-icon').forEach(img => {
 });
 
 // Enhanced CTA button click handler
-document.querySelector('.cta-button').addEventListener('click', function(e) {
-    e.preventDefault();
-    this.classList.add('loading');
-    
-    // Simulate loading
-    setTimeout(() => {
-        this.classList.remove('loading');
-        window.location.href = this.getAttribute('href');
-    }, 1000);
+const ctaButton = document.querySelector('.cta-button');
+if (ctaButton) {
+    ctaButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        this.classList.add('loading');
+        
+        // Simulate loading
+        setTimeout(() => {
+            this.classList.remove('loading');
+            window.location.href = this.getAttribute('href');
+        }, 1000);
+    });
+}
+
+// All buttons default click behavior
+document.querySelectorAll('button[data-action], .service-card, button').forEach(element => {
+    element.addEventListener('click', function(e) {
+        // Primary button actions via data-action attribute
+        const action = this.dataset.action;
+        if (action) {
+            e.preventDefault();
+            switch (action) {
+                case 'login':
+                    window.location.href = 'login.html';
+                    break;
+                case 'signup':
+                    window.location.href = 'signup.html';
+                    break;
+                case 'home':
+                    window.location.href = 'index.html';
+                    break;
+                case 'services':
+                    window.location.href = 'services.html';
+                    break;
+                case 'providers':
+                    window.location.href = 'providers.html';
+                    break;
+                default:
+                    console.info('Unhandled button action:', action);
+            }
+        }
+    });
+});
+
+// Service card click actions
+document.querySelectorAll('.service-card').forEach(card => {
+    card.addEventListener('click', function() {
+        const serviceName = this.querySelector('h3')?.textContent?.trim() || 'services';
+        const queryParam = encodeURIComponent(serviceName.replace('&', 'and'));
+        window.location.href = `providers.html?service=${queryParam}`;
+    });
 });
 
 // Add tooltips to service cards
