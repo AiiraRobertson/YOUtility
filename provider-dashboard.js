@@ -402,8 +402,8 @@ function generateActiveJobsHTML() {
                                     Mark Complete
                                 </button>
                             ` : ''}
-                            <button class="action-btn contact" onclick="contactCustomer(${booking.customerPhone})">
-                                Contact Customer
+                            <button class="action-btn contact" onclick="contactCustomer(${booking.id})">
+                                💬 Message Customer
                             </button>
                         </div>
                     </div>
@@ -674,14 +674,49 @@ function closeModal() {
 // Action functions
 function acceptBooking(bookingId) {
     const booking = providerBookings.find(b => b.id === bookingId);
+    const currentUser = getCurrentUser();
     if (booking) {
         booking.status = 'accepted';
         booking.acceptedAt = new Date().toISOString();
+        booking.providerId = currentUser.email;
+        booking.providerName = currentUser.name;
+        
+        // Create notification for customer
+        addNotification(
+            booking.customerEmail,
+            'Job Accepted!',
+            `${currentUser.name} has accepted your ${booking.service} booking for ${formatDate(booking.date)}`,
+            bookingId
+        );
+        
         loadDashboardStats();
-        showDashboardTab('incoming');
         closeModal();
-        showMessage('Job accepted successfully!', 'success');
+        showMessage('Job accepted successfully! Opening messaging...', 'success');
+        
+        // Show messaging modal
+        setTimeout(() => {
+            showMessagingModal(bookingId, currentUser);
+        }, 500);
     }
+}
+
+function showMessagingModal(bookingId, currentUser) {
+    const booking = providerBookings.find(b => b.id === bookingId);
+    if (!booking) return;
+
+    const modal = document.getElementById('messaging-modal');
+    if (!modal) return;
+
+    const messagingBody = document.getElementById('messaging-body');
+    messagingBody.innerHTML = generateMessagingUI(booking, currentUser, true);
+
+    modal.style.display = 'block';
+
+    // Auto-focus the message input
+    setTimeout(() => {
+        const messageInput = document.getElementById('message-input');
+        if (messageInput) messageInput.focus();
+    }, 100);
 }
 
 function rejectBooking(bookingId) {
@@ -734,8 +769,12 @@ function completeJob(bookingId) {
     }
 }
 
-function contactCustomer(phoneNumber) {
-    window.location.href = `tel:${phoneNumber}`;
+function contactCustomer(bookingId) {
+    const booking = providerBookings.find(b => b.id === bookingId);
+    const currentUser = getCurrentUser();
+    if (booking && currentUser) {
+        showMessagingModal(bookingId, currentUser);
+    }
 }
 
 function viewReview(bookingId) {

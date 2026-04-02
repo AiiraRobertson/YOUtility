@@ -21,6 +21,7 @@
     </header>
 
     <main>
+        <button class="back-button" onclick="goBack()"><span class="back-arrow">←</span> Back</button>
         <section class="dashboard-section">
             <div class="dashboard-header">
                 <h1>Provider Dashboard</h1>
@@ -94,7 +95,18 @@
         </div>
     </div>
 
+    <!-- Modal for messaging -->
+    <div id="messaging-modal" class="modal">
+        <div class="modal-content messaging-modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="messaging-body">
+                <!-- Messaging content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
+    <script src="messaging.js"></script>
     <script src="provider-dashboard.js"></script>
 </body>
 </html>

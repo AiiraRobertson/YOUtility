@@ -130,14 +130,44 @@ function displayProviders(providersToShow) {
     });
 }
 
+// Get all unique services from providers array
+function getUniqueServices() {
+    const services = [...new Set(providers.map(provider => provider.service))];
+    return services.sort();
+}
+
+// Populate service filter dropdown with all available services
+function populateServiceFilter() {
+    const serviceFilter = document.getElementById('service-filter');
+    const uniqueServices = getUniqueServices();
+    
+    // Clear existing options except "All Services"
+    serviceFilter.innerHTML = '<option value="">All Services</option>';
+    
+    // Add all unique services
+    uniqueServices.forEach(service => {
+        const option = document.createElement('option');
+        option.value = service;
+        option.textContent = service.charAt(0).toUpperCase() + service.slice(1);
+        serviceFilter.appendChild(option);
+    });
+}
+
 function filterProviders() {
-    const serviceFilter = document.getElementById('service-filter').value;
+    const serviceFilter = document.getElementById('service-filter').value.toLowerCase();
     const locationFilter = document.getElementById('location-filter').value.toLowerCase();
+    const searchInput = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase() : '';
 
     const filteredProviders = providers.filter(provider => {
-        const matchesService = !serviceFilter || provider.service === serviceFilter;
+        const matchesService = !serviceFilter || provider.service.toLowerCase() === serviceFilter;
         const matchesLocation = !locationFilter || provider.location.toLowerCase().includes(locationFilter);
-        return matchesService && matchesLocation;
+        const matchesSearch = !searchInput || 
+            provider.name.toLowerCase().includes(searchInput) || 
+            provider.service.toLowerCase().includes(searchInput) || 
+            provider.description.toLowerCase().includes(searchInput) ||
+            provider.location.toLowerCase().includes(searchInput);
+        
+        return matchesService && matchesLocation && matchesSearch;
     });
 
     displayProviders(filteredProviders);
@@ -151,9 +181,12 @@ function getServiceFromURL() {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
+    // Populate service filter with all unique services
+    populateServiceFilter();
+    
     const serviceFromURL = getServiceFromURL();
     if (serviceFromURL) {
-        document.getElementById('service-filter').value = serviceFromURL;
+        document.getElementById('service-filter').value = serviceFromURL.toLowerCase();
     }
 
     displayProviders(providers);
@@ -161,5 +194,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add event listeners
     document.getElementById('service-filter').addEventListener('change', filterProviders);
     document.getElementById('location-filter').addEventListener('input', filterProviders);
+    
+    // Add search input listener if it exists
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', filterProviders);
+    }
+    
     document.getElementById('search-btn').addEventListener('click', filterProviders);
 });

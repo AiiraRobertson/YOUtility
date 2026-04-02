@@ -21,6 +21,7 @@
     </header>
 
     <main>
+        <button class="back-button" onclick="goBack()"><span class="back-arrow">←</span> Back</button>
         <section class="profile-section">
             <div class="profile-header" id="profile-header">
                 <!-- Profile header will be populated by JavaScript -->
@@ -46,7 +47,18 @@
         <p>&copy; 2023 YOUtility. All rights reserved.</p>
     </footer>
 
+    <!-- Modal for messaging -->
+    <div id="messaging-modal" class="modal">
+        <div class="modal-content messaging-modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="messaging-body">
+                <!-- Messaging content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
+    <script src="messaging.js"></script>
     <script src="profile.js"></script>
 </body>
 </html>

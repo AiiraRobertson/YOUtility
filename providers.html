@@ -21,19 +21,13 @@
     </header>
 
     <main>
+        <button class="back-button" onclick="goBack()"><span class="back-arrow">←</span> Back</button>
         <section class="providers-section">
             <h1>Service Providers</h1>
             <div class="filters">
+                <input type="text" id="search-input" placeholder="Search by name, service, or location...">
                 <select id="service-filter">
                     <option value="">All Services</option>
-                    <option value="electrician">Electricians</option>
-                    <option value="plumber">Plumbers</option>
-                    <option value="carpenter">Carpenters</option>
-                    <option value="mechanic">Car Mechanics</option>
-                    <option value="painter">Painters</option>
-                    <option value="barber">Barbers</option>
-                    <option value="chef">Chefs</option>
-                    <option value="other">Other</option>
                 </select>
                 <input type="text" id="location-filter" placeholder="Enter location...">
                 <button id="search-btn">Search</button>
@@ -48,7 +42,18 @@
         <p>&copy; 2023 YOUtility. All rights reserved.</p>
     </footer>
 
+    <!-- Modal for messaging -->
+    <div id="messaging-modal" class="modal">
+        <div class="modal-content messaging-modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="messaging-body">
+                <!-- Messaging content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
+    <script src="messaging.js"></script>
     <script src="providers.js"></script>
 </body>
 </html>

@@ -1,5 +1,15 @@
 // script.js - Main JavaScript file for YOUtility
 
+// Back button functionality
+function goBack() {
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        // If no history, go to home page
+        window.location.href = 'index.html';
+    }
+}
+
 // Smooth scrolling for navigation links
 document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
