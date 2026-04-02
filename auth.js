@@ -176,10 +176,14 @@ document.getElementById('signupForm').addEventListener('submit', function(e) {
     existingUsers.push(user);
     localStorage.setItem('youutilityUsers', JSON.stringify(existingUsers));
 
-    showMessage('Account created successfully! Redirecting to home...', 'success');
+    showMessage('Account created successfully! Redirecting...', 'success');
     setTimeout(() => {
         localStorage.setItem('youutilityCurrentUser', JSON.stringify(user));
-        window.location.href = 'home.html';
+        if (isProvider) {
+            window.location.href = 'provider-dashboard.html';
+        } else {
+            window.location.href = 'home.html';
+        }
     }, 1200);
 });
 

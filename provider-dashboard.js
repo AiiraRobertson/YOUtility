@@ -135,12 +135,24 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+function getProviderRelevantBookings() {
+    const currentUser = getCurrentUser();
+    if (!currentUser || !currentUser.isProvider || !currentUser.serviceType) {
+        return providerBookings;
+    }
+
+    const normalizedService = currentUser.serviceType.trim().toLowerCase();
+    return providerBookings.filter(booking => booking.service.trim().toLowerCase() === normalizedService);
+}
+
 function loadDashboardStats() {
+    const relevantBookings = getProviderRelevantBookings();
+
     const stats = {
-        pending: providerBookings.filter(b => b.status === 'pending').length,
-        active: providerBookings.filter(b => b.status === 'accepted' || b.status === 'in_progress').length,
-        completed: providerBookings.filter(b => b.status === 'completed').length,
-        earnings: providerBookings
+        pending: relevantBookings.filter(b => b.status === 'pending').length,
+        active: relevantBookings.filter(b => b.status === 'accepted' || b.status === 'in_progress').length,
+        completed: relevantBookings.filter(b => b.status === 'completed').length,
+        earnings: relevantBookings
             .filter(b => b.status === 'completed')
             .reduce((total, booking) => total + booking.price, 0)
     };
@@ -151,12 +163,14 @@ function loadDashboardStats() {
     document.getElementById('earnings-total').textContent = `$${stats.earnings}`;
 }
 
-function showDashboardTab(tabName) {
+function showDashboardTab(tabName, event) {
     // Update tab buttons
     document.querySelectorAll('.tab-button').forEach(btn => {
         btn.classList.remove('active');
     });
-    event.target.classList.add('active');
+    if (event && event.target) {
+        event.target.classList.add('active');
+    }
 
     // Load content based on tab
     const contentContainer = document.getElementById('dashboard-content');
@@ -174,17 +188,121 @@ function showDashboardTab(tabName) {
         case 'earnings':
             contentContainer.innerHTML = generateEarningsHTML();
             break;
+        case 'profile':
+            contentContainer.innerHTML = generateProviderProfileHTML();
+            setupProfileForm();
+            break;
+        default:
+            contentContainer.innerHTML = '<p>Unknown tab.</p>';
+            break;
     }
 }
 
+function getCurrentUser() {
+    try {
+        return JSON.parse(localStorage.getItem('youutilityCurrentUser')) || null;
+    } catch (err) {
+        return null;
+    }
+}
+
+function saveCurrentUser(user) {
+    if (!user || !user.email) return;
+
+    const existingUsers = JSON.parse(localStorage.getItem('youutilityUsers') || '[]');
+    const updatedUsers = existingUsers.map(u => (u.email === user.email ? { ...u, ...user } : u));
+    localStorage.setItem('youutilityUsers', JSON.stringify(updatedUsers));
+    localStorage.setItem('youutilityCurrentUser', JSON.stringify(user));
+}
+
+function generateProviderProfileHTML() {
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+        return '<p>No user logged in. Please <a href="login.html">login</a>.</p>';
+    }
+
+    return `
+        <div class="profile-edit-section">
+            <h2>My Provider Profile</h2>
+            <form id="provider-profile-form" class="provider-profile-form">
+                <label>Full Name</label>
+                <input id="profile-name" name="name" type="text" value="${currentUser.name || ''}" required />
+
+                <label>Email (readonly)</label>
+                <input id="profile-email" name="email" type="email" value="${currentUser.email || ''}" readonly />
+
+                <label>Phone</label>
+                <input id="profile-phone" name="phone" type="text" value="${currentUser.phone || ''}" required />
+
+                <label>Service Type</label>
+                <input id="profile-service-type" name="serviceType" type="text" value="${currentUser.serviceType || ''}" required />
+
+                <label>Years of Experience</label>
+                <input id="profile-experience" name="experience" type="number" min="0" value="${currentUser.experience || ''}" required />
+
+                <label>Bio</label>
+                <textarea id="profile-bio" name="bio" rows="4">${currentUser.bio || ''}</textarea>
+
+                <label>Hourly Rate</label>
+                <input id="profile-price" name="price" type="text" value="${currentUser.price || ''}" placeholder="$xx/hour" />
+
+                <button type="submit" class="action-btn save-profile">Save Changes</button>
+            </form>
+            <div id="profile-save-message" class="auth-message" style="display:none; margin-top:12px;"></div>
+        </div>
+    `;
+}
+
+function setupProfileForm() {
+    const profileForm = document.getElementById('provider-profile-form');
+    if (!profileForm) return;
+
+    profileForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const user = getCurrentUser();
+        if (!user) return;
+
+        const updatedUser = {
+            ...user,
+            name: document.getElementById('profile-name').value.trim(),
+            phone: document.getElementById('profile-phone').value.trim(),
+            serviceType: document.getElementById('profile-service-type').value.trim(),
+            experience: document.getElementById('profile-experience').value.trim(),
+            bio: document.getElementById('profile-bio').value.trim(),
+            price: document.getElementById('profile-price').value.trim()
+        };
+
+        if (updatedUser.name.length < 2) {
+            showMessage('Please enter a valid name.', 'error');
+            return;
+        }
+
+        saveCurrentUser(updatedUser);
+        document.getElementById('profile-save-message').textContent = 'Profile updated successfully!';
+        document.getElementById('profile-save-message').style.display = 'block';
+        document.getElementById('profile-save-message').style.backgroundColor = '#4CAF50';
+        document.getElementById('profile-save-message').style.color = '#fff';
+
+        setTimeout(() => {
+            document.getElementById('profile-save-message').style.display = 'none';
+        }, 2500);
+
+        loadDashboardStats();
+    });
+}
+
+
 function generateIncomingBookingsHTML() {
-    const pendingBookings = providerBookings.filter(b => b.status === 'pending');
+    const pendingBookings = getProviderRelevantBookings().filter(b => b.status === 'pending');
+    const currentUser = getCurrentUser();
+    const serviceTypeLabel = currentUser && currentUser.serviceType ? currentUser.serviceType : 'your service';
 
     if (pendingBookings.length === 0) {
         return `
             <div class="no-bookings">
-                <h3>No Incoming Bookings</h3>
-                <p>You don't have any pending booking requests at the moment.</p>
+                <h3>No Incoming ${serviceTypeLabel} Bookings</h3>
+                <p>You don't have any pending booking requests for ${serviceTypeLabel.toLowerCase()} at the moment.</p>
             </div>
         `;
     }
@@ -229,12 +347,12 @@ function generateIncomingBookingsHTML() {
 }
 
 function generateActiveJobsHTML() {
-    const activeBookings = providerBookings.filter(b => b.status === 'accepted' || b.status === 'in_progress');
+    const activeBookings = getProviderRelevantBookings().filter(b => b.status === 'accepted' || b.status === 'in_progress');
 
     if (activeBookings.length === 0) {
         return `
             <div class="no-bookings">
-                <h3>No Active Jobs</h3>
+                <h3>No Active ${getCurrentUser()?.serviceType || 'Service'} Jobs</h3>
                 <p>You don't have any active jobs at the moment.</p>
             </div>
         `;
@@ -296,12 +414,12 @@ function generateActiveJobsHTML() {
 }
 
 function generateJobHistoryHTML() {
-    const completedBookings = providerBookings.filter(b => b.status === 'completed' || b.status === 'rejected');
+    const completedBookings = getProviderRelevantBookings().filter(b => b.status === 'completed' || b.status === 'rejected');
 
     if (completedBookings.length === 0) {
         return `
             <div class="no-bookings">
-                <h3>No Job History</h3>
+                <h3>No ${getCurrentUser()?.serviceType || 'Job'} History</h3>
                 <p>You haven't completed any jobs yet.</p>
             </div>
         `;
@@ -353,7 +471,7 @@ function generateJobHistoryHTML() {
 }
 
 function generateEarningsHTML() {
-    const completedBookings = providerBookings.filter(b => b.status === 'completed');
+    const completedBookings = getProviderRelevantBookings().filter(b => b.status === 'completed');
     const totalEarnings = completedBookings.reduce((total, booking) => total + booking.price, 0);
     const monthlyEarnings = calculateMonthlyEarnings();
     const averageRating = calculateAverageRating();
@@ -416,7 +534,7 @@ function calculateMonthlyEarnings() {
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
 
-    const monthlyJobs = providerBookings.filter(booking => {
+    const monthlyJobs = getProviderRelevantBookings().filter(booking => {
         if (booking.status !== 'completed') return false;
         const completedDate = new Date(booking.completedAt || booking.date);
         return completedDate.getMonth() === currentMonth && completedDate.getFullYear() === currentYear;
@@ -429,7 +547,7 @@ function calculateMonthlyEarnings() {
 }
 
 function calculateAverageRating() {
-    const ratedBookings = providerBookings.filter(b => b.rating);
+    const ratedBookings = getProviderRelevantBookings().filter(b => b.rating);
     if (ratedBookings.length === 0) return 0;
 
     const totalRating = ratedBookings.reduce((sum, booking) => sum + booking.rating, 0);
