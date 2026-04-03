@@ -70,7 +70,7 @@ exports.updateProfile = async (req, res) => {
             return res.status(400).json({ success: false, errors: errors.array() });
         }
 
-        const { firstName, lastName, phone, address, experience, certifications } = req.body;
+        const { firstName, lastName, phone, address, experience, certifications, serviceType, bio, price } = req.body;
 
         // Check authorization
         if (req.params.id !== req.user.id) {
@@ -90,8 +90,11 @@ exports.updateProfile = async (req, res) => {
         
         // Provider specific updates
         if (user.userType === 'provider') {
-            if (experience) user.experience = experience;
+            if (experience !== undefined) user.experience = experience;
             if (certifications) user.certifications = certifications;
+            if (serviceType !== undefined) user.serviceType = serviceType;
+            if (bio !== undefined) user.bio = bio;
+            if (price !== undefined) user.price = price;
         }
 
         await user.save();

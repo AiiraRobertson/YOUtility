@@ -202,9 +202,18 @@ function handleSendMessage(event, bookingId, senderId, senderName, receiverEmail
     // Refresh the messaging UI
     const messagingContainer = document.querySelector('.messaging-container');
     if (messagingContainer) {
-        // You might want to refresh the conversation UI here
-        // For now, just clear and reload
-        location.reload();
+        // Re-render the messaging UI
+        const booking = window.providerBookings ? window.providerBookings.find(b => b.id === bookingId) : null;
+        const currentUser = JSON.parse(localStorage.getItem('youutilityCurrentUser'));
+        if (booking && currentUser) {
+            const isProvider = currentUser.userType === 'provider';
+            messagingContainer.innerHTML = generateMessagingUI(booking, currentUser, isProvider);
+            // Auto-focus the message input
+            setTimeout(() => {
+                const messageInput = document.getElementById('message-input');
+                if (messageInput) messageInput.focus();
+            }, 100);
+        }
     }
 }
 

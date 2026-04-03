@@ -1,123 +1,11 @@
 // provider-dashboard.js - Provider dashboard functionality
 
-// Sample provider bookings data (in a real app, this would come from a server)
-const providerBookings = [
-    {
-        id: 1,
-        customerName: 'Alice Johnson',
-        customerPhone: '+1 (555) 123-4567',
-        customerEmail: 'alice.johnson@email.com',
-        service: 'Electrician',
-        description: 'Fix outlet in kitchen and install new light fixture',
-        date: '2024-01-20',
-        time: 'Morning (9:00 AM - 12:00 PM)',
-        duration: '3 hours',
-        address: '123 Main St, New York, NY 10001',
-        price: 180,
-        status: 'pending', // pending, accepted, in_progress, completed, rejected
-        createdAt: '2024-01-15T10:30:00Z',
-        notes: ''
-    },
-    {
-        id: 2,
-        customerName: 'Bob Smith',
-        customerPhone: '+1 (555) 234-5678',
-        customerEmail: 'bob.smith@email.com',
-        service: 'Plumber',
-        description: 'Unclog bathroom sink and check for leaks',
-        date: '2024-01-18',
-        time: 'Afternoon (1:00 PM - 4:00 PM)',
-        duration: '3 hours',
-        address: '456 Oak Ave, Los Angeles, CA 90210',
-        price: 150,
-        status: 'accepted',
-        createdAt: '2024-01-14T14:20:00Z',
-        acceptedAt: '2024-01-14T16:45:00Z',
-        notes: 'Customer mentioned slow draining'
-    },
-    {
-        id: 3,
-        customerName: 'Carol Davis',
-        customerPhone: '+1 (555) 345-6789',
-        customerEmail: 'carol.davis@email.com',
-        service: 'Carpenter',
-        description: 'Build custom shelves in home office',
-        date: '2024-01-16',
-        time: 'Morning (10:00 AM - 2:00 PM)',
-        duration: '4 hours',
-        address: '789 Pine St, Chicago, IL 60601',
-        price: 250,
-        status: 'in_progress',
-        createdAt: '2024-01-12T09:15:00Z',
-        acceptedAt: '2024-01-12T11:30:00Z',
-        startedAt: '2024-01-16T10:15:00Z',
-        progress: 60,
-        notes: 'Materials: oak wood, brackets, screws'
-    },
-    {
-        id: 4,
-        customerName: 'David Wilson',
-        customerPhone: '+1 (555) 456-7890',
-        customerEmail: 'david.wilson@email.com',
-        service: 'Car Mechanic',
-        description: 'Oil change and brake inspection',
-        date: '2024-01-10',
-        time: 'Afternoon (2:00 PM - 5:00 PM)',
-        duration: '3 hours',
-        address: '321 Elm St, Houston, TX 77001',
-        price: 120,
-        status: 'completed',
-        createdAt: '2024-01-08T13:45:00Z',
-        acceptedAt: '2024-01-08T15:20:00Z',
-        startedAt: '2024-01-10T14:00:00Z',
-        completedAt: '2024-01-10T16:30:00Z',
-        rating: 5,
-        review: 'Excellent service! Very professional and thorough.',
-        notes: 'Replaced brake pads, oil change completed'
-    },
-    {
-        id: 5,
-        customerName: 'Emma Brown',
-        customerPhone: '+1 (555) 567-8901',
-        customerEmail: 'emma.brown@email.com',
-        service: 'Painter',
-        description: 'Paint living room walls - 12x15 room',
-        date: '2024-01-22',
-        time: 'Morning (8:00 AM - 12:00 PM)',
-        duration: '4 hours',
-        address: '654 Maple Dr, Miami, FL 33101',
-        price: 200,
-        status: 'pending',
-        createdAt: '2024-01-17T08:00:00Z',
-        notes: ''
-    },
-    {
-        id: 6,
-        customerName: 'Frank Miller',
-        customerPhone: '+1 (555) 678-9012',
-        customerEmail: 'frank.miller@email.com',
-        service: 'Electrician',
-        description: 'Install ceiling fan in bedroom',
-        date: '2024-01-12',
-        time: 'Afternoon (1:00 PM - 3:00 PM)',
-        duration: '2 hours',
-        address: '987 Cedar Ln, Seattle, WA 98101',
-        price: 140,
-        status: 'completed',
-        createdAt: '2024-01-10T10:30:00Z',
-        acceptedAt: '2024-01-10T12:15:00Z',
-        startedAt: '2024-01-12T13:00:00Z',
-        completedAt: '2024-01-12T15:00:00Z',
-        rating: 4,
-        review: 'Good work, fan works perfectly.',
-        notes: 'Used existing wiring, no issues'
-    }
-];
+// Bookings will be loaded from API
+let providerBookings = [];
 
 // Initialize dashboard when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    loadDashboardStats();
-    showDashboardTab('incoming');
+    loadProviderBookings();
 
     // Modal close functionality
     document.querySelectorAll('.close-modal').forEach(closeBtn => {
@@ -134,6 +22,54 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Load provider bookings from API
+async function loadProviderBookings() {
+    try {
+        const result = await bookingAPI.getProviderBookings();
+        if (result && result.bookings && Array.isArray(result.bookings)) {
+            // Map API data to frontend format
+            providerBookings = result.bookings.map(booking => ({
+                id: booking._id || booking.id,
+                customerName: booking.customer?.firstName + ' ' + booking.customer?.lastName || 'Unknown',
+                customerPhone: booking.customer?.phone || '',
+                customerEmail: booking.customer?.email || '',
+                service: booking.service?.name || booking.service || 'Service',
+                description: booking.description || '',
+                date: booking.scheduledDate || new Date(),
+                time: booking.scheduledTime || '',
+                duration: booking.duration || 0,
+                address: booking.location?.street + ', ' + booking.location?.city || 'Address not provided',
+                price: booking.price?.totalPrice || 0,
+                status: booking.status || 'pending',
+                progress: booking.progress || 0,
+                createdAt: booking.createdAt,
+                acceptedAt: booking.acceptedAt,
+                startedAt: booking.startedAt,
+                completedAt: booking.completedAt,
+                rating: booking.rating,
+                review: booking.review,
+                notes: booking.notes || ''
+            }));
+        } else {
+            console.warn('Unexpected API response format:', result);
+            providerBookings = [];
+        }
+    } catch (error) {
+        console.error('Error loading bookings from API:', error);
+        // Fallback to empty array if API fails
+        providerBookings = [];
+    }
+    
+    // Initialize dashboard UI
+    loadDashboardStats();
+    showDashboardTab('incoming');
+}
+
+// Simple message display function for this page
+function showMessage(message, type = 'info') {
+    console.log(`[${type.toUpperCase()}] ${message}`);
+}
 
 function getProviderRelevantBookings() {
     const currentUser = getCurrentUser();
@@ -257,15 +193,20 @@ function setupProfileForm() {
     const profileForm = document.getElementById('provider-profile-form');
     if (!profileForm) return;
 
-    profileForm.addEventListener('submit', function(event) {
+    profileForm.addEventListener('submit', async function(event) {
         event.preventDefault();
 
         const user = getCurrentUser();
         if (!user) return;
 
-        const updatedUser = {
-            ...user,
-            name: document.getElementById('profile-name').value.trim(),
+        const nameValue = document.getElementById('profile-name').value.trim();
+        const nameParts = nameValue.split(' ');
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
+
+        const updatedData = {
+            firstName,
+            lastName,
             phone: document.getElementById('profile-phone').value.trim(),
             serviceType: document.getElementById('profile-service-type').value.trim(),
             experience: document.getElementById('profile-experience').value.trim(),
@@ -273,22 +214,36 @@ function setupProfileForm() {
             price: document.getElementById('profile-price').value.trim()
         };
 
-        if (updatedUser.name.length < 2) {
-            showMessage('Please enter a valid name.', 'error');
+        if (firstName.length < 2) {
+            showMessage('Please enter a valid first name.', 'error');
             return;
         }
 
-        saveCurrentUser(updatedUser);
-        document.getElementById('profile-save-message').textContent = 'Profile updated successfully!';
-        document.getElementById('profile-save-message').style.display = 'block';
-        document.getElementById('profile-save-message').style.backgroundColor = '#4CAF50';
-        document.getElementById('profile-save-message').style.color = '#fff';
+        try {
+            // Call API to update profile
+            const result = await window.API.user.updateProfile(updatedData);
+            if (result.success) {
+                // Update localStorage with the response
+                const updatedUser = { ...user, ...updatedData };
+                saveCurrentUser(updatedUser);
+                
+                document.getElementById('profile-save-message').textContent = 'Profile updated successfully!';
+                document.getElementById('profile-save-message').style.display = 'block';
+                document.getElementById('profile-save-message').style.backgroundColor = '#4CAF50';
+                document.getElementById('profile-save-message').style.color = '#fff';
 
-        setTimeout(() => {
-            document.getElementById('profile-save-message').style.display = 'none';
-        }, 2500);
+                setTimeout(() => {
+                    document.getElementById('profile-save-message').style.display = 'none';
+                }, 2500);
 
-        loadDashboardStats();
+                loadDashboardStats();
+            } else {
+                showMessage('Failed to update profile. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            showMessage('Error updating profile. Please try again.', 'error');
+        }
     });
 }
 
@@ -672,33 +627,41 @@ function closeModal() {
 }
 
 // Action functions
-function acceptBooking(bookingId) {
+async function acceptBooking(bookingId) {
     const booking = providerBookings.find(b => b.id === bookingId);
     const currentUser = getCurrentUser();
-    if (booking) {
-        booking.status = 'accepted';
-        booking.acceptedAt = new Date().toISOString();
-        booking.providerId = currentUser.email;
-        booking.providerName = currentUser.name;
-        
-        // Create notification for customer
-        addNotification(
-            booking.customerEmail,
-            'Job Accepted!',
-            `${currentUser.name} has accepted your ${booking.service} booking for ${formatDate(booking.date)}`,
-            bookingId
-        );
-        
-        loadDashboardStats();
-        closeModal();
-        showMessage('Job accepted successfully! Opening messaging...', 'success');
-        
-        // Show messaging modal
-        setTimeout(() => {
-            showMessagingModal(bookingId, currentUser);
-        }, 500);
+    if (booking && currentUser) {
+        try {
+            // Call API to accept booking
+            const result = await bookingAPI.acceptBooking(bookingId);
+            if (result && result.success) {
+                booking.status = 'accepted';
+                booking.acceptedAt = new Date().toISOString();
+                
+                // Create notification for customer
+                addNotification(
+                    booking.customerEmail,
+                    'Job Accepted!',
+                    `${currentUser.name} has accepted your ${booking.service} booking for ${formatDate(booking.date)}`,
+                    bookingId
+                );
+                
+                loadDashboardStats();
+                closeModal();
+                showMessage('Job accepted successfully! Opening messaging...', 'success');
+                
+                // Show messaging modal
+                setTimeout(() => {
+                    showMessagingModal(bookingId, currentUser);
+                }, 500);
+            } else {
+                showMessage('Failed to accept job. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error accepting booking:', error);
+            showMessage('Error accepting job. Please try again.', 'error');
+        }
     }
-}
 
 function showMessagingModal(bookingId, currentUser) {
     const booking = providerBookings.find(b => b.id === bookingId);
@@ -719,53 +682,97 @@ function showMessagingModal(bookingId, currentUser) {
     }, 100);
 }
 
-function rejectBooking(bookingId) {
+async function rejectBooking(bookingId) {
     const reason = document.getElementById('reject-reason').value;
     const booking = providerBookings.find(b => b.id === bookingId);
     if (booking) {
-        booking.status = 'rejected';
-        booking.rejectReason = reason;
-        loadDashboardStats();
-        showDashboardTab('incoming');
-        closeModal();
-        showMessage('Job rejected.', 'info');
+        try {
+            // Call API to reject booking
+            const result = await bookingAPI.rejectBooking(bookingId, reason);
+            if (result && result.success) {
+                booking.status = 'rejected';
+                booking.rejectReason = reason;
+                loadDashboardStats();
+                showDashboardTab('incoming');
+                closeModal();
+                showMessage('Job rejected.', 'info');
+            } else {
+                showMessage('Failed to reject job. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error rejecting booking:', error);
+            showMessage('Error rejecting job. Please try again.', 'error');
+        }
     }
 }
 
-function startJob(bookingId) {
+async function startJob(bookingId) {
     const booking = providerBookings.find(b => b.id === bookingId);
     if (booking) {
-        booking.status = 'in_progress';
-        booking.startedAt = new Date().toISOString();
-        booking.progress = 10;
-        loadDashboardStats();
-        showDashboardTab('active');
-        showMessage('Job started! Keep customers updated on progress.', 'success');
+        try {
+            // Call API to start job
+            const result = await bookingAPI.startBooking(bookingId);
+            if (result && result.success) {
+                booking.status = 'in_progress';
+                booking.startedAt = new Date().toISOString();
+                booking.progress = 10;
+                loadDashboardStats();
+                showDashboardTab('active');
+                showMessage('Job started! Keep customers updated on progress.', 'success');
+            } else {
+                showMessage('Failed to start job. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error starting job:', error);
+            showMessage('Error starting job. Please try again.', 'error');
+        }
     }
 }
 
-function updateProgress(bookingId) {
+async function updateProgress(bookingId) {
     const progress = parseInt(document.getElementById('progress-percent').value);
     const notes = document.getElementById('progress-notes').value;
 
     const booking = providerBookings.find(b => b.id === bookingId);
     if (booking) {
-        booking.progress = progress;
-        booking.notes = notes;
-        showDashboardTab('active');
-        closeModal();
-        showMessage('Progress updated successfully!', 'success');
+        try {
+            // Call API to update progress
+            const result = await bookingAPI.updateProgress(bookingId, progress, notes);
+            if (result && result.success) {
+                booking.progress = progress;
+                booking.notes = notes;
+                showDashboardTab('active');
+                closeModal();
+                showMessage('Progress updated successfully!', 'success');
+            } else {
+                showMessage('Failed to update progress. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error updating progress:', error);
+            showMessage('Error updating progress. Please try again.', 'error');
+        }
     }
 }
 
-function completeJob(bookingId) {
+async function completeJob(bookingId) {
     const booking = providerBookings.find(b => b.id === bookingId);
     if (booking) {
-        booking.status = 'completed';
-        booking.completedAt = new Date().toISOString();
-        loadDashboardStats();
-        showDashboardTab('active');
-        showMessage('Job marked as completed! Customer will be notified.', 'success');
+        try {
+            // Call API to complete job
+            const result = await bookingAPI.completeBooking(bookingId);
+            if (result && result.success) {
+                booking.status = 'completed';
+                booking.completedAt = new Date().toISOString();
+                loadDashboardStats();
+                showDashboardTab('active');
+                showMessage('Job marked as completed! Customer will be notified.', 'success');
+            } else {
+                showMessage('Failed to complete job. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error completing job:', error);
+            showMessage('Error completing job. Please try again.', 'error');
+        }
     }
 }
 
@@ -815,4 +822,5 @@ function formatStatus(status) {
         'rejected': 'Rejected'
     };
     return statusMap[status] || status;
+}
 }

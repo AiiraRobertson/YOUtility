@@ -50,7 +50,12 @@ exports.register = async (req, res) => {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
-                userType: user.userType
+                userType: user.userType,
+                phone: user.phone,
+                serviceType: user.serviceType,
+                experience: user.experience,
+                bio: user.bio,
+                price: user.price
             }
         });
     } catch (error) {
@@ -94,7 +99,11 @@ exports.login = async (req, res) => {
                 lastName: user.lastName,
                 email: user.email,
                 userType: user.userType,
-                phone: user.phone
+                phone: user.phone,
+                serviceType: user.serviceType,
+                experience: user.experience,
+                bio: user.bio,
+                price: user.price
             }
         });
     } catch (error) {
@@ -111,7 +120,18 @@ exports.getMe = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            user
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                userType: user.userType,
+                phone: user.phone,
+                serviceType: user.serviceType,
+                experience: user.experience,
+                bio: user.bio,
+                price: user.price
+            }
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

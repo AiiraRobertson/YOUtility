@@ -66,7 +66,19 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Service'
     }],
+    serviceType: {
+        type: String,
+        default: ''
+    },
     experience: {
+        type: String,
+        default: ''
+    },
+    bio: {
+        type: String,
+        default: ''
+    },
+    price: {
         type: String,
         default: ''
     },
